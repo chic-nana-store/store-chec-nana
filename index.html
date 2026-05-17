@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chic Nana Mode | المتجر الرسمي</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Great+Vibes&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --dark-bg: #0b0f19;
+            --card-bg: #111827;
+            --gold: #dfc374;
+            --gold-hover: #f3dc9b;
+            --text-white: #f9fafb;
+            --text-muted: #9ca3af;
+            --danger: #ef4444;
+            --whatsapp: #25d366;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--dark-bg); color: var(--text-white); padding-bottom: 20px; }
+
+        header { 
+            background: linear-gradient(135deg, #111827 0%, #030712 100%);
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 2px solid var(--gold);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .logo-container { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto; max-width: 160px; }
+        .logo-svg { width: 100%; height: auto; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
+        
+        /* تصميم شبكة المنتجات المتجاوب مع الهاتف */
+        .products-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+        }
+        
+        /* تعديل مخصص للهواتف الصغيرة جداً لتفادي التداخل */
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: 1fr; }
+        }
+
+        .product-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid #1f2937;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease; 
+            display: flex; 
+            flex-direction: column;
+            position: relative;
+        }
+        .product-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 10px 25px rgba(223, 195, 116, 0.15); }
+        
+        .badge-discount { position: absolute; top: 12px; right: 12px; background: var(--danger); color: white; padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 6px; z-index: 10; }
+        .badge-stock { position: absolute; top: 12px; left: 12px; background: #374151; color: var(--gold); padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 6px; z-index: 10; }
+
+        .image-container { position: relative; width: 100%; height: 340px; background: #1f2937; overflow: hidden; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .img-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: var(--gold); border: none; width: 36px; height: 36px; cursor: pointer; font-size: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .img-nav:hover { background: rgba(0,0,0,0.8); color: white; }
+        .img-nav.prev { left: 10px; }
+        .img-nav.next { right: 10px; }
+
+        .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; text-align: center; }
+        .product-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-white); }
+        .stars { color: var(--gold); margin-bottom: 12px; font-size: 13px; letter-spacing: 2px; }
+        
+        .price-box { margin-bottom: 18px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .price-final { font-size: 20px; font-weight: 700; color: var(--gold); }
+        .price-original { font-size: 14px; text-decoration: line-through; color: var(--text-muted); }
+
+        .btn-whatsapp { 
+            background-color: var(--whatsapp); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+            transition: background 0.2s;
+            text-decoration: none;
+            margin-top: auto;
+        }
+        .btn-whatsapp:hover { background-color: #128c7e; }
+
+        /* فوتر ذكي ومتجاوب بالكامل مع الهواتف والأيقونات الاحترافية */
+        footer { background: #030712; padding: 40px 20px; border-top: 1px solid #1f2937; text-align: center; color: var(--text-muted); }
+        .footer-grid { max-width: 900px; margin: 0 auto 30px auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+
+        .social-btn { display: flex; align-items: center; gap: 12px; background: #111827; border: 1px solid #1f2937; padding: 14px; border-radius: 8px; color: var(--text-white); text-decoration: none; transition: all 0.3s ease; text-align: right; }
+        .social-btn i { font-size: 20px; width: 25px; text-align: center; }
+        .social-btn.wa i { color: var(--whatsapp); }
+        .social-btn.ig i { color: #e1306c; }
+        .social-btn.tt i { color: #ff0050; }
+        .social-btn.maps i { color: #ea4335; }
+        .social-btn:hover { border-color: var(--gold); background: #1f2937; transform: translateY(-2px); }
+        .social-btn span strong { color: var(--gold); display: block; font-size: 12px; }
+
+        .copyright { border-top: 1px solid #1f2937; padding-top: 20px; font-size: 13px; }
+        .no-products { text-align: center; width: 100%; grid-column: 1 / -1; padding: 60px 0; color: var(--text-muted); font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="75" fill="none" stroke="#dfc374" stroke-width="3" />
+                <text x="100" y="90" font-family="'Cinzel', serif" font-size="20" font-weight="800" fill="#dfc374" letter-spacing="2" text-anchor="middle">CHIC NANA</text>
+                <path d="M 45,105 Q 100,120 155,105" fill="none" stroke="#dfc374" stroke-width="1.5" />
+                <text x="100" y="145" font-family="'Great Vibes', cursive" font-size="42" fill="#f9fafb" text-anchor="middle">Mode</text>
+            </svg>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="products-grid" id="productsDisplayContainer"></div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <a href="https://wa.me/212657995082" target="_blank" class="social-btn wa">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span><strong>تواصل معنا فوري</strong>0657995082</span>
+            </a>
+            <a href="https://www.instagram.com/CHIC_NANA_MODE" target="_blank" class="social-btn ig">
+                <i class="fa-brands fa-instagram"></i>
+                <span><strong>تابعنا على إنستغرام</strong>@CHIC_NANA_MODE</span>
+            </a>
+            <a href="https://www.tiktok.com/@CHIC_NANA_MODE" target="_blank" class="social-btn tt">
+                <i class="fa-brands fa-tiktok"></i>
+                <span><strong>شاهد جديدنا على تيك توك</strong>@CHIC_NANA_MODE</span>
+            </a>
+            <a href="https://maps.google.com/?q=Res+Al+Anfal+Bd+Med+Zafzaf+Imm+08+Sidi+Moumen+Casablanca" target="_blank" class="social-btn maps">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span><strong>موقع المحل على الخريطة</strong>سيدي مومن، الدار البيضاء</span>
+            </a>
+        </div>
+        <div class="copyright">
+            &copy; 2026 CHIC NANA MODE. كل الحقوق محفوظة.
+        </div>
+    </footer>
+
+    <script>
+        const WHATSAPP_NUMBER = "212657995082"; 
+
+        function loadStoreProducts() {
+            const container = document.getElementById('productsDisplayContainer');
+            const products = JSON.parse(localStorage.getItem('store_products')) || [];
+
+            if (products.length === 0) {
+                container.innerHTML = '<p class="no-products"><i class="fa-solid fa-bag-shopping" style="display:block; margin-bottom:15px; font-size:30px; color:var(--gold)"></i>مرحباً بك في CHIC NANA MODE. ترقبوا تشكيلة أزيائنا الجديدة قريباً!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            products.forEach((product, pIndex) => {
+                const hasImages = product.images && product.images.length > 0;
+                const mainImgSrc = hasImages ? product.images[0] : 'https://via.placeholder.com/300?text=Chic+Nana';
+                
+                let discountBadge = product.discount > 0 ? `<div class="badge-discount">خصم ${product.discount}%</div>` : '';
+                let stockBadge = product.stock <= 0 ? `<div class="badge-stock" style="color:var(--danger);">نفذ</div>` : `<div class="badge-stock">متوفر</div>`;
+
+                let starsHtml = '';
+                if(product.rating > 0) {
+                    starsHtml = '<div class="stars">';
+                    for(let i=0; i<product.rating; i++) { starsHtml += '★'; }
+                    starsHtml += '</div>';
+                }
+
+                let priceHtml = product.discount > 0 ? 
+                    `<div class="price-box"><span class="price-final">${product.finalPrice} درهم</span><span class="price-original">${product.originalPrice} درهم</span></div>` : 
+                    `<div class="price-box"><span class="price-final">${product.originalPrice} درهم</span></div>`;
+
+                const whatsappMessage = encodeURIComponent(`مرحباً Chic Nana Mode، أريد طلب هذا المنتج: ${product.name}`);
+                const orderAction = product.stock <= 0 ? 
+                    `<button class="btn-whatsapp" style="background:#4b5563; cursor:not-allowed;" disabled><i class="fa-solid fa-circle-xmark"></i> غير متوفر حالياً</button>` :
+                    `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> طلب عبر واتساب</a>`;
+
+                container.innerHTML += `
+                    <div class="product-card">
+                        ${discountBadge}
+                        ${stockBadge}
+                        <div class="image-container">
+                            ${hasImages && product.images.length > 1 ? `<button class="img-nav prev" onclick="navigateImage(${pIndex}, -1)"><i class="fa-solid fa-chevron-left"></i></button>` : ''}
+                            <img src="${mainImgSrc}" id="img-store-${pIndex}" class="product-img">
+                            ${hasImages && product.images.length > 1 ? `<button class="img-nav next" onclick="navigateImage(${pIndex}, 1)"><i class="fa-solid fa-chevron-right"></i></button>` : ''}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.name}</h3>
+                            ${starsHtml}
+                            ${priceHtml}
+                            ${orderAction}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.navigateImage = function(productIndex, direction) {
+            const products = JSON.parse(localStorage.getItem('store_products')) || [];
+            const product = products[productIndex];
+            if (!product || !product.images || product.images.length <= 1) return;
+
+            const imgElement = document.getElementById(`img-store-${productIndex}`);
+            let currentIndex = parseInt(imgElement.getAttribute('data-index')) || 0;
+
+            currentIndex += direction;
+            if (currentIndex >= product.images.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = product.images.length - 1;
+
+            imgElement.setAttribute('data-index', currentIndex);
+            imgElement.src = product.images[currentIndex];
+        }
+
+        window.onload = loadStoreProducts;
+    </script>
+</body>
+</html>
