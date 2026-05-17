@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم المتقدمة | نظام الإدارة والتعديل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: #334155;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
+
+        #loginScreen { background: var(--card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); width: 100%; max-width: 400px; margin-top: 10vh; text-align: center; }
+        #loginScreen input { width: 100%; padding: 12px; border: 1px solid var(--border); background: #0f172a; color: white; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+        #loginScreen button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        #adminDashboard { display: none; width: 100%; max-width: 950px; background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .dash-header { background: #0f172a; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        
+        .tabs-menu { display: flex; flex-wrap: wrap; background: #0f172a; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 15px 20px; border: none; background: none; font-size: 15px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--text); border-bottom-color: var(--primary); font-weight: bold; }
+        .tab-content { padding: 20px; display: none; }
+        .tab-content.active { display: block; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-group.full-width { grid-column: auto !important; } }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group.full-width { grid-column: span 2; }
+        label { font-weight: 500; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+        input, select { padding: 12px; border: 1px solid var(--border); background: #0f172a; color: white; border-radius: 8px; }
+        
+        .file-drop-area { border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; position: relative; }
+        .file-drop-area input[type="file"] { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
+        .preview-images-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-img-wrapper { position: relative; width: 70px; height: 70px; border-radius: 6px; overflow: hidden; }
+        .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        .price-calculation { background: #1e3a8a; padding: 12px; border-radius: 8px; font-weight: bold; color: #60a5fa; display: flex; justify-content: space-between; }
+        .stars-rating { display: flex; gap: 5px; font-size: 24px; color: #475569; cursor: pointer; direction: ltr; justify-content: flex-end; }
+        .stars-rating span.active { color: var(--warning); }
+
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        
+        /* جدول وتنسيق متجاوب */
+        .table-wrapper { overflow-x: auto; }
+        .pro-table { width: 100%; border-collapse: collapse; text-align: right; }
+        .pro-table th, .pro-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .pro-table th { background: #0f172a; color: var(--muted); }
+        .img-stack img { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; margin-left: 3px; }
+        
+        .btn-edit { color: var(--warning); margin-left: 10px; background: none; border: none; cursor: pointer; font-weight: bold; }
+        .btn-del { color: var(--danger); background: none; border: none; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen">
+        <h2><i class="fa-solid fa-lock" style="color:var(--gold); margin-bottom:15px; display:block;"></i> دخول الإدارة</h2>
+        <input type="password" id="passInput" placeholder="أدخل كلمة المرور الحالية">
+        <button onclick="checkAdminPass()">دخول آمن</button>
+    </div>
+
+    <div id="adminDashboard">
+        <div class="dash-header">
+            <h2>لوحة التحكم المتقدمة v3.0</h2>
+            <button style="background:none; border:1px solid var(--border); color:white; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="logoutAdmin()">خروج</button>
+        </div>
+
+        <div class="tabs-menu">
+            <button class="tab-btn active" onclick="toggleTab('manage-products', this)">المنتجات الحالية</button>
+            <button class="tab-btn" id="addTabBtn" onclick="toggleTab('add-product', this)">إضافة منتج جديد</button>
+            <button class="tab-btn" onclick="toggleTab('security-settings', this)">إعدادات الأمان (تغيير الرمز)</button>
+        </div>
+
+        <div id="manage-products" class="tab-content active">
+            <div class="table-wrapper">
+                <table class="pro-table">
+                    <thead>
+                        <tr>
+                            <th>الصور</th>
+                            <th>الاسم</th>
+                            <th>المخزن</th>
+                            <th>الأصلي</th>
+                            <th>الخصم</th>
+                            <th>النهائي</th>
+                            <th>التقييم</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableRows"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="add-product" class="tab-content">
+            <h3 id="formModeTitle" style="margin-bottom:15px; color:var(--gold);">إضافة منتج جديد للمتجر</h3>
+            <form id="proProductForm" onsubmit="saveProductData(event)">
+                <input type="hidden" id="editProductIndex" value="-1">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>اسم المنتج *</label>
+                        <input type="text" id="pName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الثمن الأصلي (درهم) *</label>
+                        <input type="number" id="pPrice" required min="1" oninput="calculateFinalPrice()">
+                    </div>
+                    <div class="form-group">
+                        <label>نسبة الخصم % (اختياري)</label>
+                        <input type="number" id="pDiscount" min="0" max="100" oninput="calculateFinalPrice()">
+                    </div>
+                    <div class="form-group full-width">
+                        <div class="price-calculation">
+                            <span>الثمن النهائي بعد الإحتساب:</span>
+                            <span id="finalPriceDisplay">0 درهم</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>الكمية المتوفرة في المخزن *</label>
+                        <input type="number" id="pStock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>تقييم المنتج بالنجوم</label>
+                        <div class="stars-rating" id="starsRatingContainer">
+                            <span data-value="5" onclick="setRating(5)">★</span>
+                            <span data-value="4" onclick="setRating(4)">★</span>
+                            <span data-value="3" onclick="setRating(3)">★</span>
+                            <span data-value="2" onclick="setRating(2)">★</span>
+                            <span data-value="1" onclick="setRating(1)">★</span>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>تحميل الصور من الجهاز (يمكن اختيار صور متعددة) *</label>
+                        <div class="file-drop-area">
+                            <span>اضغط هنا لتحديد صور جديدة (أو اتركها كما هي عند التعديل)</span>
+                            <input type="file" id="pImages" multiple accept="image/*" onchange="handleImageUpload(event)">
+                        </div>
+                        <div class="preview-images-container" id="imagesPreviewArea"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtnText">نشر المنتج بالمتجر</button>
+            </form>
+        </div>
+
+        <div id="security-settings" class="tab-content">
+            <h3 style="margin-bottom:15px; color:var(--danger);"><i class="fa-solid fa-shield-halved"></i> نقل الملكية وتغيير كلمة السر</h3>
+            <div style="max-width:400px;">
+                <div class="form-group">
+                    <label>كلمة المرور الجديدة *</label>
+                    <input type="password" id="newAdminPass" placeholder="اكتب الرمز السري الجديد">
+                </div>
+               
+                <button class="btn-submit" style="background:var(--success)" onclick="changePassword()">تحديث رمز الإدارة السري</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImagesBase64 = [];
+        let selectedRating = 0;
+
+        // الحصول على كلمة السر المخزنة أو تعيين الافتراضية admin123
+        function getAdminPassword() {
+            return localStorage.getItem('admin_pass') || 'admin123';
+        }
+
+        function checkAdminPass() {
+            if(document.getElementById('passInput').value === getAdminPassword()) {
+                sessionStorage.setItem('proAdmin', 'true');
+                showDashboard();
+            } else { alert("رمز الدخول غير صحيح!"); }
+        }
+
+        function changePassword() {
+            const newPass = document.getElementById('newAdminPass').value.trim();
+            if(newPass.length < 4) {
+                alert("الرجاء اختيار كلمة مرور قوية مكونة من 4 أحرف أو أرقام على الأقل.");
+                return;
+            }
+            localStorage.setItem('admin_pass', newPass);
+            alert("تم تغيير كلمة المرور بنظام التشغيل بنجاح! يمكن للمالك الجديد الدخول بها الآن.");
+            document.getElementById('newAdminPass').value = '';
+            logoutAdmin();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            renderProductsTable();
+        }
+        function logoutAdmin() { sessionStorage.removeItem('proAdmin'); location.reload(); }
+        window.onload = function() { if(sessionStorage.getItem('proAdmin') === 'true') showDashboard(); }
+
+        function toggleTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(btn) btn.classList.add('active');
+
+            if(id !== 'add-product') {
+                document.getElementById('proProductForm').reset();
+                document.getElementById('editProductIndex').value = "-1";
+                document.getElementById('formModeTitle').innerText = "إضافة منتج جديد للمتجر";
+                document.getElementById('submitBtnText').innerText = "نشر المنتج بالمتجر";
+                document.getElementById('imagesPreviewArea').innerHTML = '';
+                uploadedImagesBase64 = [];
+                setRating(0);
+            }
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            const previewArea = document.getElementById('imagesPreviewArea');
+            previewArea.innerHTML = '';
+            uploadedImagesBase64 = [];
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImagesBase64.push(e.target.result);
+                    previewArea.innerHTML += `<div class="preview-img-wrapper"><img src="${e.target.result}"></div>`;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function calculateFinalPrice() {
+            const price = parseFloat(document.getElementById('pPrice').value) || 0;
+            const discount = parseFloat(document.getElementById('pDiscount').value) || 0;
+            const finalPrice = price - (price * (discount / 100));
+            document.getElementById('finalPriceDisplay').innerText = `${finalPrice.toFixed(2)} درهم`;
+            return finalPrice.toFixed(2);
+        }
+
+        function setRating(val) {
+            selectedRating = val;
+            const stars = document.querySelectorAll('#starsRatingContainer span');
+            stars.forEach(star => {
+                const starVal = parseInt(star.getAttribute('data-value'));
+                if(starVal <= val) star.classList.add('active'); else star.classList.remove('active');
+            });
+        }
+
+        function getStoredData() { return JSON.parse(localStorage.getItem('store_products')) || []; }
+
+        // دالة مشتركة مدمجة للإضافة أو التعديل
+        function saveProductData(e) {
+            e.preventDefault();
+            const editIndex = parseInt(document.getElementById('editProductIndex').value);
+            const products = getStoredData();
+
+            const productData = {
+                name: document.getElementById('pName').value.trim(),
+                originalPrice: parseFloat(document.getElementById('pPrice').value),
+                discount: parseFloat(document.getElementById('pDiscount').value) || 0,
+                finalPrice: calculateFinalPrice(),
+                stock: parseInt(document.getElementById('pStock').value) || 0,
+                rating: selectedRating,
+                images: uploadedImagesBase64.length > 0 ? uploadedImagesBase64 : (editIndex > -1 ? products[editIndex].images : [])
+            };
+
+            if (editIndex > -1) {
+                products[editIndex] = productData;
+                alert('تم تعديل وتحديث بيانات المنتج فورياً!');
+            } else {
+                products.push(productData);
+                alert('تم نشر المنتج بنجاح وتحديث المتجر!');
+            }
+
+            localStorage.setItem('store_products', JSON.stringify(products));
+            toggleTab('manage-products', document.querySelectorAll('.tab-btn')[0]);
+        }
+
+        // تفعيل وضع التعديل وملء الحقول بالمعطيات السابقة للمنتج
+        window.startEditProduct = function(index) {
+            const products = getStoredData();
+            const prod = products[index];
+            if(!prod) return;
+
+            document.getElementById('editProductIndex').value = index;
+            document.getElementById('pName').value = prod.name;
+            document.getElementById('pPrice').value = prod.originalPrice;
+            document.getElementById('pDiscount').value = prod.discount;
+            document.getElementById('pStock').value = prod.stock;
+            
+            setRating(prod.rating);
+            calculateFinalPrice();
+
+            const previewArea = document.getElementById('imagesPreviewArea');
+            previewArea.innerHTML = '';
+            if(prod.images) {
+                prod.images.forEach(img => {
+                    previewArea.innerHTML += `<div class="preview-img-wrapper"><img src="${img}"></div>`;
+                });
+            }
+
+            document.getElementById('formModeTitle').innerText = `تعديل المنتج: ${prod.name}`;
+            document.getElementById('submitBtnText').innerText = "حفظ التغييرات بالمتجر";
+            
+            toggleTab('add-product', document.getElementById('addTabBtn'));
+        }
+
+        function renderProductsTable() {
+            const products = getStoredData();
+            const tbody = document.getElementById('productsTableRows');
+            tbody.innerHTML = '';
+
+            products.forEach((prod, index) => {
+                let imgStackHtml = '<div class="img-stack">';
+                if(prod.images && prod.images.length > 0) {
+                    prod.images.slice(0, 2).forEach(img => { imgStackHtml += `<img src="${img}">`; });
+                } else { imgStackHtml += `<img src="https://via.placeholder.com/35">`; }
+                imgStackHtml += '</div>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${imgStackHtml}</td>
+                        <td style="font-weight:600;">${prod.name}</td>
+                        <td>${prod.stock > 0 ? 'متوفر ('+prod.stock+')' : 'نفذ'}</td>
+                        <td>${prod.originalPrice} د.م</td>
+                        <td>${prod.discount}%</td>
+                        <td style="color:var(--success); font-weight:bold;">${prod.finalPrice} د.م</td>
+                        <td>${prod.rating} ★</td>
+                        <td>
+                            <button class="btn-edit" onclick="startEditProduct(${index})"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-del" onclick="deleteProProduct(${index})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.deleteProProduct = function(index) {
+            if(confirm("هل تريد حذف هذا المنتج نهائياً؟")) {
+                const products = getStoredData();
+                products.splice(index, 1);
+                localStorage.setItem('store_products', JSON.stringify(products));
+                renderProductsTable();
+            }
+        }
+        // ... الكود القديم ديال السكريبت كيبقى هو هو، غتعوض غير هاد الأجزاء الخاصة بالأمان والتغيير:
+
+// الكود السري الرئيسي المتفق عليه (الحماية ضد الغدر)
+const MASTER_KEY = "adamadam2011adam123456anasichicnana78910111213141516171819éèàçanasi";
+
+// الحصول على كلمة السر الحالية للإدارة (الافتراضية هي admin123 يلا ما بدلوهاش)
+function getAdminPassword() {
+    return localStorage.getItem('admin_pass') || 'admin123';
+}
+
+function checkAdminPass() {
+    const inputPass = document.getElementById('passInput').value;
+    // يقدر يدخل بالكود السري الحالي أو بالكود الرئيسي ديالك نتا ديما
+    if(inputPass === getAdminPassword() || inputPass === MASTER_KEY) {
+        sessionStorage.setItem('proAdmin', 'true');
+        showDashboard();
+    } else { 
+        alert("رمز الدخول غير صحيح! تفادى المحاولات العشوائية."); 
+    }
+}
+
+// دالة تغيير كلمة المرور الذكية والمحمية بالكود الرئيسي
+function changePassword() {
+    // نطلبوا منهم يدخلوا الكود الرئيسي ديالك أولاً لتأكيد الهوية تفادياً للغدر
+    const masterCheck = prompt("لحماية الملكية، يرجى إدخال الكود السري الرئيسي للمطور (Master Key):");
+    
+    if (masterCheck !== MASTER_KEY) {
+        alert("⚠️ عذراً! الكود الرئيسي للمطور غير صحيح. لا يمكن تغيير إعدادات الأمان بدون إذن آدم!");
+        return;
+    }
+
+    const newPass = document.getElementById('newAdminPass').value.trim();
+    if(newPass.length < 4) {
+        alert("الرجاء اختيار كلمة مرور مكونة من 4 أحرف أو أرقام على الأقل.");
+        return;
+    }
+    
+    localStorage.setItem('admin_pass', newPass);
+    alert("🔒 تم تحديث رمز الإدارة بنجاح! الموقع الآن محمي ومأمن للمالك الجديد.");
+    document.getElementById('newAdminPass').value = '';
+    logoutAdmin();
+}
+    </script>
+</body>
+</html>
